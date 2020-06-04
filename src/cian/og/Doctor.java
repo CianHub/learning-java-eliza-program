@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class Doctor {
 
-    private static final Random RANDOM = new Random();
+    private static final Random RANDOM_GENERATOR = new Random();
 
     private static final List<String> MATCHES = List.of(
             "life",
@@ -51,7 +51,7 @@ public class Doctor {
             "quit"
     );
 
-    private static final Map<String, String> REFLECTIONS = Map.ofEntries(
+    private static final Map<String, String> reflections = Map.ofEntries(
             Map.entry(" am", " are"),
             Map.entry(" was", " were"),
             Map.entry("I ", "you "),
@@ -69,7 +69,7 @@ public class Doctor {
             Map.entry("I'm", "you're")
     );
 
-    private static final List<List<String>> RESPONSES = List.of(
+    private static final List<List<String>> responses = List.of(
             List.of("Life? Don't talk to me about life.", "At least you have a life, I'm stuck inside this computer.", "Life can be good. Remember, 'this, too, will pass'."),
             List.of("Why do you need %1?", "Would it really help you to get %1?", "Are you sure you need %1?"),
             List.of("Do you really think I don't %1?", "Perhaps eventually I will %1.", "Do you really want me to %1?"),
@@ -124,31 +124,31 @@ public class Doctor {
                 "Hello. How are you feeling today?");
     }
 
-    public static String response(String UserInput) {
-        // check through the matches list, and if there's a match, strip off the match and replace with the response.
+    public static String response(String userInput) {
+        // check through the MATCHES list, and if there's a match, strip off the match and replace with the response.
         //
-        // If the response contains %1, replace that with the Remainder of the input string.
-        // Before replacing, change words in the Remainder of the input with the corresponding entry from the reflections dictionary.
-        var output = "";
-        String Remainder = "";
+        // If the response contains %1, replace that with the remainder of the input string.
+        // Before replacing, change words in the remainder of the input with the corresponding entry from the reflections dictionary.
+        String output = "";
+        String remainder = "";
 
-        for (var index = 0; index < MATCHES.size(); index++) {
+        for (int index = 0; index < MATCHES.size(); index++) {
             String match = MATCHES.get(index);
-            int position = UserInput.toLowerCase().indexOf(match);
+            int position = userInput.toLowerCase().indexOf(match);
 
             if (position > -1) {
                 // found a match, delete everything up to the end of the text we found.
-                var rem = UserInput.substring(0, position + match.length()); // get String that need to be removed
-                rem = UserInput.replace(rem, "");   // replace removed String with empty e.g. remove it
+                String rem = userInput.substring(0, position + match.length()); // get String that need to be removed
+                rem = userInput.replace(rem, "");   // replace removed String with empty e.g. remove it
 
                 // Now replace the reflections: I -> you, etc
                 // We need to split the input into words, to avoid changing eg. me -> you then the same you -> me.
                 String[] words = rem.split(" ");
 
                 for (int i = 0; i < words.length; i++) {
-                    for (String reflection : REFLECTIONS.keySet()) {
+                    for (String reflection : reflections.keySet()) {
                         if (words[i].equals(reflection)) {
-                            words[i] = REFLECTIONS.get(reflection);
+                            words[i] = reflections.get(reflection);
                         }
                     }
                 }
@@ -157,22 +157,22 @@ public class Doctor {
                 rem = String.join(" ", words);
 
                 // strip leading and trailing spaces
-                Remainder = rem.trim();
+                remainder = rem.trim();
 
-                var randomIndex = RANDOM.nextInt(RESPONSES.get(index).size());
-                output = RESPONSES.get(index).get(randomIndex);
+                int randomIndex = RANDOM_GENERATOR.nextInt(responses.get(index).size());
+                output = responses.get(index).get(randomIndex);
                 break;
             }
         }
 
         // If there wasn't a match, use the last item in the responses list.
         if (output.isBlank()) {
-            int randomIndex = RANDOM.nextInt(RESPONSES.get(RESPONSES.size() - 1).size());
-            output = RESPONSES.get(RESPONSES.size() - 1).get(randomIndex);
+            int randomIndex = RANDOM_GENERATOR.nextInt(responses.get(responses.size() - 1).size());
+            output = responses.get(responses.size() - 1).get(randomIndex);
         }
 
         // Now substitute the modified input for %1 (if it exists) in the response.
-        output = output.replace("%1", Remainder);
+        output = output.replace("%1", remainder);
         return output;
     }
 
